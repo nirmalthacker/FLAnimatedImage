@@ -60,10 +60,16 @@
         self.accumulator = 0.0;
         
         // Start animating after the new animated image has been set.
+        
+        /*
+         I am commenting this out since I'd like the animation to not start until i have called start animate
+         -NT 
+         see also: https://github.com/Flipboard/FLAnimatedImage/issues/52
+         
         [self updateShouldAnimate];
         if (self.shouldAnimate) {
             [self startAnimating];
-        }
+        }*/
         
         [self.layer setNeedsDisplay];
     }
