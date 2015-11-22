@@ -18,12 +18,14 @@
 @property (nonatomic, strong, readwrite) UIImage *currentFrame;
 @property (nonatomic, assign, readwrite) NSUInteger currentFrameIndex;
 
-@property (nonatomic, assign) NSUInteger loopCountdown;
+
 @property (nonatomic, assign) NSTimeInterval accumulator;
 @property (nonatomic, strong) CADisplayLink *displayLink;
 
 @property (nonatomic, assign) BOOL shouldAnimate; // Before checking this value, call `-updateShouldAnimate` whenever the animated image, window or superview has changed.
 @property (nonatomic, assign) BOOL needsDisplayWhenImageBecomesAvailable;
+
+
 
 @end
 
@@ -52,11 +54,15 @@
         
         self.currentFrame = animatedImage.posterImage;
         self.currentFrameIndex = 0;
+        self.loopCountdown = 1;
+        
+        /*
         if (animatedImage.loopCount > 0) {
             self.loopCountdown = animatedImage.loopCount;
         } else {
             self.loopCountdown = NSUIntegerMax;
-        }
+        }*/
+        
         self.accumulator = 0.0;
         
         // Start animating after the new animated image has been set.
@@ -65,11 +71,12 @@
          I am commenting this out since I'd like the animation to not start until i have called start animate
          -NT 
          see also: https://github.com/Flipboard/FLAnimatedImage/issues/52
-         
+       
+        
         [self updateShouldAnimate];
         if (self.shouldAnimate) {
             [self startAnimating];
-        }*/
+         }*/
         
         [self.layer setNeedsDisplay];
     }
@@ -92,9 +99,10 @@
 {
     [super didMoveToSuperview];
     
+    
     [self updateShouldAnimate];
     if (self.shouldAnimate) {
-        [self startAnimating];
+        //[self startAnimating];
     } else {
         [self stopAnimating];
     }
@@ -105,9 +113,10 @@
 {
     [super didMoveToWindow];
     
+    
     [self updateShouldAnimate];
     if (self.shouldAnimate) {
-        [self startAnimating];
+        //[self startAnimating];
     } else {
         [self stopAnimating];
     }
@@ -233,7 +242,10 @@
 // Just update our cached value whenever the animated image, window or superview is changed.
 - (void)updateShouldAnimate
 {
+    
     self.shouldAnimate = self.animatedImage && self.window && self.superview;
+    //Doesnt seem to work if i just set this to false - NT
+    //self.shouldAnimate = false;
 }
 
 
@@ -270,6 +282,11 @@
                     // If we've looped the number of times that this animated image describes, stop looping.
                     self.loopCountdown--;
                     if (self.loopCountdown == 0) {
+                        if (self.animationCompletionBlock != nil) {
+                            if (self.animationCompletionBlock){
+                                    self.animationCompletionBlock();
+                            }
+                        }
                         [self stopAnimating];
                         return;
                     }
